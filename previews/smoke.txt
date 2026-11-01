@@ -8,4 +8,6 @@ PASS  FAB -> design bottom sheet opens
 PASS  tap outside -> sheet closes
 PASS  tab bar switches screens  now=settings
 PASS  gallery screens are generated
-FAIL  no runtime errors  CONSOLE Failed to load resource: the server responded with a status of 404 (Not Found)
+FAIL  design sections index -> kit gallery page  opened=settings
+PASS  back from gallery returns to the app
+FAIL  no runtime errors  EXC ReferenceError: addPageBack is not defined
