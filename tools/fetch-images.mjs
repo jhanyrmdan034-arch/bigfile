@@ -14,7 +14,10 @@ const manifest = JSON.parse(fs.readFileSync(`${WWW}/manifest.json`, 'utf8'));
 const needed = manifest.images || [];
 console.log('images referenced by the design:', needed.length);
 
-if (!fs.existsSync(UNZIP_DIR) || fs.readdirSync(UNZIP_DIR).length < needed.length) {
+const already = needed.filter((img) => fs.existsSync(`${IMG_OUT}/${img.hash}.webp`) || fs.existsSync(`${IMG_OUT}/${img.hash}.png`)).length;
+const skipAll = already >= needed.length * 0.98;
+if (skipAll) console.log('all design images already extracted:', already, '/', needed.length);
+if (!skipAll && (!fs.existsSync(UNZIP_DIR) || fs.readdirSync(UNZIP_DIR).length < needed.length)) {
   fs.mkdirSync(UNZIP_DIR, { recursive: true });
   console.log('extracting images from big.zip ...');
   execSync('unzip -o -j -q big.zip "images/*" -d ' + UNZIP_DIR, { cwd: ROOT, stdio: 'inherit' });
