@@ -1,0 +1,15 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+Error [TypeError]: Cannot read properties of null (reading 'dispatchEvent')
+    at evaluate (evaluate at file:///home/runner/work/bigfile/bigfile/tools/smoke.mjs:81:12, <anonymous>:0:39)
+    at #evaluate (file:///home/runner/work/bigfile/bigfile/tools/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:402:19)
+    at async ExecutionContext.evaluate (file:///home/runner/work/bigfile/bigfile/tools/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:288:16)
+    at async IsolatedWorld.evaluate (file:///home/runner/work/bigfile/bigfile/tools/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:104:16)
+    at async CdpFrame.evaluate (file:///home/runner/work/bigfile/bigfile/tools/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:364:20)
+    at async CdpPage.evaluate (file:///home/runner/work/bigfile/bigfile/tools/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:832:20)
+    at async file:///home/runner/work/bigfile/bigfile/tools/smoke.mjs:81:1
+
+Node.js v22.23.4
+SMOKE_FAILED 1
