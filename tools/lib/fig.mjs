@@ -180,6 +180,10 @@ function adjustChildren(parent, children) {
       const cx = tr.m02 + w / 2, cy = tr.m12 + h / 2;
       if (Math.abs(cx - innerW / 2) < 40 && Math.abs(cy - innerH / 2) < 40) { w = innerW; h = innerH; changed = true; }
     }
+    // (f) sliced backgrounds (BG / Liquid Glass / Fill / Blur) cover their parent
+    if (!changed && atOrigin && /^(BG|Liquid Glass|Fill|Blur|Effect|Surface)$/i.test(c.name) && innerW > w + 0.5) {
+      w = innerW; changed = true;
+    }
     // (d) background layers never stick out of their component
     if (!changed && atOrigin && BG_LAYER.test(c.name) && (w > innerW + 0.5 || h > innerH + 0.5) && innerW > 0 && innerH > 0) {
       w = Math.min(w, innerW); h = Math.min(h, innerH); changed = true;

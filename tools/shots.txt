@@ -1,1 +1,1 @@
-chat-personal,chat-group
+chat-personal,chat-group,chat-bot

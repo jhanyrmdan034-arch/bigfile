@@ -275,6 +275,29 @@ function vectorHtml(n, blobs) {
 }
 
 const SKIP_NAMES = new Set(['Bezel']);
+function geometryShape(n, blobs) {
+  const geoms = [...(n.fillGeometry || []), ...(n.strokeGeometry || [])];
+  for (const g of geoms) {
+    const b = blobs[g.commandsBlob];
+    if (!b) continue;
+    const d = parseCommands(b.bytes);
+    if (!d) continue;
+    const nums = (d.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+    let mnx = Infinity, mny = Infinity, mxx = -Infinity, mxy = -Infinity;
+    for (let i = 0; i + 1 < nums.length; i += 2) {
+      mnx = Math.min(mnx, nums[i]); mxx = Math.max(mxx, nums[i]);
+      mny = Math.min(mny, nums[i + 1]); mxy = Math.max(mxy, nums[i + 1]);
+    }
+    const bw = mxx - mnx, bh = mxy - mny;
+    const w = n.size?.x ?? 0, h = n.size?.y ?? 0;
+    // a slice that must be stretched to the node box
+    if (bw > 0.5 && bh > 0.5 && (Math.abs(bw - w) > 1.5 || Math.abs(bh - h) > 1.5 || Math.abs(mnx) > 1.5 || Math.abs(mny) > 1.5) && w > 0 && h > 0) {
+      return { d, vb: `${h2(mnx)} ${h2(mny)} ${h2(bw)} ${h2(bh)}` };
+    }
+  }
+  return null;
+}
+
 function renderNode(n, blobs, depth, ctx) {
   if (n.visible === false) return '';
   if (SKIP_NAMES.has(n.name) && depth > 0) return '';
