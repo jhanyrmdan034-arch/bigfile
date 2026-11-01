@@ -90,10 +90,12 @@ function nodeStyle(n, ctx) {
   const tr = n.transform || { m00: 1, m01: 0, m02: 0, m10: 0, m11: 1, m12: 0 };
   const st = [];
   const simple = Math.abs(tr.m00 - 1) < 1e-5 && Math.abs(tr.m11 - 1) < 1e-5 && Math.abs(tr.m01) < 1e-5 && Math.abs(tr.m10) < 1e-5;
+  const sc = n.__scaleTo;
   if (simple) {
     st.push(`left:${h2(tr.m02)}px`, `top:${h2(tr.m12)}px`);
+    if (sc) st.push(`transform:scale(${sc.kx.toFixed(5)},${sc.ky.toFixed(5)})`, 'transform-origin:0 0');
   } else {
-    st.push('left:0', 'top:0', `transform:matrix(${h2(tr.m00)},${h2(tr.m10)},${h2(tr.m01)},${h2(tr.m11)},${h2(tr.m02)},${h2(tr.m12)})`, 'transform-origin:0 0');
+    st.push('left:0', 'top:0', `transform:matrix(${h2(tr.m00)},${h2(tr.m10)},${h2(tr.m01)},${h2(tr.m11)},${h2(tr.m02)},${h2(tr.m12)})` + (sc ? ` scale(${sc.kx.toFixed(5)},${sc.ky.toFixed(5)})` : ''), 'transform-origin:0 0');
   }
   const w = n.size?.x ?? 0, h = n.size?.y ?? 0;
   if (w || h) st.push(`width:${h2(w)}px`, `height:${h2(h)}px`);

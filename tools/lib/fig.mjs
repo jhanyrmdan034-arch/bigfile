@@ -89,10 +89,18 @@ export function resolveTree(root, index, opts = {}) {
         const m = overrideMap(raw);
         const symPath = guidKey(sym.guid);
         node = applyOverrides(sym, m.get(symPath), { __instanceOf: raw.name, __instanceSize: raw.size, __instanceKey: guidKey(raw.guid) });
-        node.__instanceResize = { from: sym.size, to: raw.size };
-        node.size = raw.size || sym.size;
         node.transform = raw.transform || sym.transform;
         node.name = raw.name;
+        // a symbol instance drawn at a different size than its main component is scaled
+        // (Figma scales attached symbol content; the kit also uses it for icon sizes)
+        const symSize = sym.size, instSize = raw.size;
+        if (symSize && instSize && symSize.x > 0 && symSize.y > 0 &&
+            (Math.abs(instSize.x / symSize.x - 1) > 1e-3 || Math.abs(instSize.y / symSize.y - 1) > 1e-3)) {
+          node.__scaleTo = { kx: instSize.x / symSize.x, ky: instSize.y / symSize.y };
+          node.size = symSize;
+        } else {
+          node.size = raw.size || sym.size;
+        }
         node.__srcKey = sym.__key;
         childPath = [symPath];
         childOv = m;
