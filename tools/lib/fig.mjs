@@ -174,6 +174,12 @@ function adjustChildren(parent, children) {
     const growH = (c.stackChildPrimaryGrow && parent.stackMode === 'VERTICAL') || c.stackPrimarySizing === 'FILL' && parent.stackMode === 'VERTICAL' || c.stackCounterSizing === 'FILL' && parent.stackMode === 'HORIZONTAL';
     if (growW && innerW > w) { w = innerW; changed = true; }
     if (growH && innerH > h) { h = innerH; changed = true; }
+    // (e) layers that start outside their component but are meant to cover it
+    //     (e.g. a "-60,-60" pattern layer that should tile the whole chat background)
+    if (!changed && (w >= innerW - 1) && (h >= innerH - 1) && (Math.abs(tr.m02) > 1 || Math.abs(tr.m12) > 1)) {
+      const cx = tr.m02 + w / 2, cy = tr.m12 + h / 2;
+      if (Math.abs(cx - innerW / 2) < 40 && Math.abs(cy - innerH / 2) < 40) { w = innerW; h = innerH; changed = true; }
+    }
     // (d) background layers never stick out of their component
     if (!changed && atOrigin && BG_LAYER.test(c.name) && (w > innerW + 0.5 || h > innerH + 0.5) && innerW > 0 && innerH > 0) {
       w = Math.min(w, innerW); h = Math.min(h, innerH); changed = true;
@@ -182,8 +188,9 @@ function adjustChildren(parent, children) {
     if (!changed && atOrigin && !c.children?.length && BG_LAYER.test(c.name) && (w < innerW - 1 || h < innerH - 1)) {
       if (innerW > 0 && innerH > 0 && w >= innerW * 0.2 && h >= innerH * 0.2) { w = innerW; h = innerH; changed = true; }
     }
-    if (!changed) return c;
-    return { ...c, size: { x: w, y: h } };
+    if (!changed) return { ...c, __size: c.size };
+    const out = { ...c, size: { x: w, y: h }, __size: c.size };
+    return out;
   });
 }
 

@@ -112,11 +112,15 @@ function nodeStyle(n, ctx) {
 
   // fills
   const fills = (n.fillPaints || []).filter((p) => p.visible !== false);
+  if (n.__size && n.size && (Math.abs(n.__size.x - n.size.x) > 0.5 || Math.abs(n.__size.y - n.size.y) > 0.5)) {
+    // this layer was resized to cover its component: scale artwork with it
+    st.push(`--sx:${(n.size.x / n.__size.x).toFixed(4)}`, `--sy:${(n.size.y / n.__size.y).toFixed(4)}`);
+  }
   if (fills.length && n.type !== 'TEXT') {
     const css = paintsToCss(fills, w, h);
     if (css.color) st.push(`background-color:${css.color}`);
     if (css.images.length) {
-      st.push(`background-image:${css.images.join(',')}`);
+      st.push(`background-image:${css.images.filter((i) => !i.startsWith('url(')).concat(css.images.filter((i) => i.startsWith('url('))).join(',')}`);
       st.push(`background-size:${css.sizes.join(',')}`);
       st.push(`background-position:${css.positions.join(',')}`);
       st.push('background-repeat:no-repeat');
