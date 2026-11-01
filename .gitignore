@@ -1,0 +1,7 @@
+node_modules/
+www/screens/
+www/assets/img/
+www/manifest.json
+design/meta_pretty.txt
+report.txt
+tools/out/

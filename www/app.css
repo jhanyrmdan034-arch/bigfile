@@ -1,0 +1,89 @@
+/* Telegram Android UI Kit — Android UI prototype
+   Rendered 1:1 from the Figma scene graph; only interaction affordances are added. */
+* { -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden;
+  font-family: Roboto, sans-serif; -webkit-user-select: none; user-select: none;
+  overscroll-behavior: none; touch-action: manipulation;
+}
+#viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; }
+#stage {
+  position: relative; width: 412px; height: 917px; flex: none;
+  transform-origin: 50% 50%; background: #fff; overflow: hidden;
+}
+#layers { position: absolute; inset: 0; }
+.screen {
+  position: absolute; left: 0; top: 0; width: 412px; height: 917px; overflow: hidden;
+  will-change: transform, opacity; backface-visibility: hidden;
+}
+.screen .n, .screen .t, .screen .v { position: absolute; }
+.screen .t { margin: 0; pointer-events: none; }
+.screen .v { overflow: visible; }
+.screen .v svg { display: block; overflow: visible; }
+
+/* gallery pages (design-kit canvases) */
+.page { background: #e8eaed; }
+.page .scroll { position: absolute; inset: 0; overflow: auto; -webkit-overflow-scrolling: touch; }
+.page .canvas { position: relative; }
+
+/* ---------- transitions ---------- */
+.screen.enter-slide { animation: slideIn .28s cubic-bezier(.2,.75,.15,1) both; }
+.screen.exit-slide { animation: slideOut .28s cubic-bezier(.2,.75,.15,1) both; }
+.screen.enter-fade { animation: fadeIn .18s linear both; }
+.screen.exit-fade { animation: fadeOut .18s linear both; }
+.screen.enter-pop { animation: popIn .22s cubic-bezier(.2,.75,.15,1) both; }
+.screen.exit-pop { animation: popOut .22s ease-in both; }
+@keyframes slideIn { from { transform: translate3d(100%,0,0); } to { transform: translate3d(0,0,0); } }
+@keyframes slideOut { from { transform: translate3d(0,0,0); opacity: 1; } to { transform: translate3d(-28%,0,0); opacity: .6; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes popIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes popOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(.97); } }
+
+/* ---------- interactive affordances ---------- */
+.hot { position: absolute; z-index: 50; cursor: pointer; }
+.hot:active { background: rgba(0,0,0,.075); border-radius: 12px; }
+.hot.round:active { border-radius: 999px; }
+.ripple {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 60;
+  background: rgba(0,0,0,.10); transform: scale(0); opacity: .9;
+  animation: ripple .42s ease-out forwards;
+}
+@keyframes ripple { to { transform: scale(2.6); opacity: 0; } }
+
+/* sheet / dialog overlay */
+#overlay { position: absolute; inset: 0; z-index: 400; display: none; }
+#overlay.on { display: block; }
+#scrim {
+  position: absolute; inset: 0; background: rgba(0,0,0,.38); opacity: 0;
+  transition: opacity .22s ease;
+}
+#overlay.on #scrim { opacity: 1; }
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: center;
+  transform: translate3d(0,100%,0); transition: transform .3s cubic-bezier(.2,.8,.2,1);
+  will-change: transform;
+}
+#overlay.on .sheet { transform: translate3d(0,0,0); }
+.sheet .sheetInner { position: relative; width: 412px; overflow: hidden; }
+.dialog {
+  position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .18s ease; pointer-events: none;
+}
+#overlay.on .dialog { opacity: 1; pointer-events: auto; }
+.dialog .dlgInner { position: relative; transform: scale(.94); transition: transform .18s cubic-bezier(.2,.8,.2,1); max-width: 92%; }
+#overlay.on .dialog .dlgInner { transform: scale(1); }
+
+/* live chat typing: reuse the design's own placeholder text node */
+.typing .t { caret-color: transparent; }
+.caret {
+  position: absolute; width: 1.6px; background: #3390ec; z-index: 70;
+  animation: blink 1.05s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* kit index list (opened from the design's own menu sheet) */
+#hud {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 500; display: none;
+  padding: 8px 0 12px; background: transparent;
+}
