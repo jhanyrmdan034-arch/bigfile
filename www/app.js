@@ -210,7 +210,7 @@
       if (!n.classList.contains('n')) return;
       var x = parseFloat(n.style.left) || 0, y = parseFloat(n.style.top) || 0;
       var w = parseFloat(n.style.width) || 46, h = parseFloat(n.style.height) || 46;
-      hotspot(el, x - 4, y - 4, w + 8, h + 8, function () { openSheet('c-sheet-0'); }, 'round', 'fab');
+      hotspot(el, x - 4, y - 4, w + 8, h + 8, function () { openSheet('c-sheet-x0'); }, 'round', 'fab');
     });
 
     // app-bar avatar / headline -> chat info
@@ -244,13 +244,13 @@
       var lead = byName(el, 'Leading icon').filter(function (n) { return n.classList.contains('n'); })[0];
       if (lead) {
         var lx = parseFloat(lead.style.left) || 7, ly = parseFloat(lead.style.top) || 60;
-        hotspot(el, lx, ly, 46, 46, function () { openSheet('c-menu-0'); }, 'round');
+        hotspot(el, lx, ly, 46, 46, function () { openSheet('c-menu-x2'); }, 'round', 'menu');
       }
       var trail = byName(el, 'Trailing elements').filter(function (n) { return n.classList.contains('n'); })[0];
       if (trail) {
         var tx = parseFloat(trail.style.left) || 323, ty = parseFloat(trail.style.top) || 60;
         var tw = parseFloat(trail.style.width) || 82, th = parseFloat(trail.style.height) || 46;
-        hotspot(el, tx, ty, tw, th, function () { openSheet('c-menu-1'); }, 'round');
+        hotspot(el, tx, ty, tw, th, function () { openSheet('c-menu-x3'); }, 'round', 'trailing');
       }
     }
 
@@ -261,8 +261,8 @@
         var x = parseFloat(n.style.left) || 0, y = parseFloat(n.style.top) || 0;
         var w = parseFloat(n.style.width) || 412, h = parseFloat(n.style.height) || 56;
         hotspot(el, x, y, w, h, function () {
-          if (i % 4 === 0) openDialog('c-dialog-0');
-          else if (i % 4 === 1) openSheet('c-menu-2');
+          if (i % 4 === 0) openDialog('c-dialog-modal');
+          else if (i % 4 === 1) openSheet('c-menu-x2');
         }, '', 'cell');
       });
     }

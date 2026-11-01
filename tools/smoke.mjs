@@ -21,7 +21,12 @@ const page = await browser.newPage();
 await page.setViewport({ width: 412, height: 917, deviceScaleFactor: 2 });
 const errors = [];
 page.on('pageerror', (e) => errors.push('EXC ' + String(e).slice(0, 200)));
-page.on('console', (m) => { if (m.type() === 'error') errors.push('CONSOLE ' + m.text().slice(0, 200)); });
+page.on('console', (m) => {
+  const t = m.text();
+  if (m.type() === 'error' && !/favicon|404 \(Not Found\)/i.test(t)) errors.push('CONSOLE ' + t.slice(0, 200));
+});
+page.on('requestfailed', () => {});
+page.on('response', (r) => { if (r.status() === 404 && !/favicon/.test(r.url())) errors.push('HTTP404 ' + r.url()); });
 
 const results = [];
 const check = (name, ok, extra = '') => { results.push(`${ok ? 'PASS' : 'FAIL'}  ${name}${extra ? '  ' + extra : ''}`); };
@@ -93,6 +98,30 @@ const tabScreen = await page.evaluate(() => {
 check('tab bar switches screens', !!tabScreen && tabScreen !== 'chat-list', 'now=' + tabScreen);
 
 check('gallery screens are generated', fs.existsSync(path.join(WWW, 'screens/kit-general.js')) && fs.existsSync(path.join(WWW, 'screens/kit-messages.js')));
+
+// design sections index (every page of the Figma file) opens from a menu row
+const kitIndex = await page.evaluate(async () => {
+  window.__openKitIndex(window.__MANIFEST.pages);
+  await new Promise((r) => setTimeout(r, 300));
+  const rows = document.querySelectorAll('#overlay [data-page]');
+  if (!rows.length) return 'no rows';
+  rows[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 1400));
+  return document.querySelector('.screen') ? document.querySelector('.screen').dataset.screen : 'none';
+});
+check('design sections index -> kit gallery page', /^kit-/.test(kitIndex || ''), 'opened=' + kitIndex);
+await page.screenshot({ path: path.join(OUT, 'smoke-kit-page.png') });
+
+// dialog overlay
+const dialogShown = await page.evaluate(async () => {
+  window.__androidBack();
+  await new Promise((r) => setTimeout(r, 400));
+  return true;
+});
+check('back from gallery returns to the app', (await page.evaluate(() => {
+  const s = document.querySelector('.screen');
+  return !!s && !/^kit-/.test(s.dataset.screen);
+})));
 
 check('no runtime errors', errors.length === 0, errors.slice(0, 3).join(' | '));
 console.log(results.join('\n'));

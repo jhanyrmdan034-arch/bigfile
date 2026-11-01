@@ -391,6 +391,54 @@ for (const page of pages) {
 // component screens (menus, dialogs, sheets, tab bars, app bars, buttons...)
 const COMPONENT_PAGES = [['Menu', 'menu'], ['Dialogs', 'dialog'], ['Sheets', 'sheet'], ['Tab Bar', 'tabbar'], ['App bars', 'appbar'], ['Buttons', 'button'], ['Swithes', 'switch'], ['Folders', 'folder'], ['Lists', 'list'], ['Utilities', 'utility'], ['Messages', 'message']];
 manifest.components = [];
+const CUSTOM_COMPONENTS = [
+  ['sheet', 'Sheets', 'Gift table item'],
+  ['sheet', 'Sheets', 'Gift sheet'],
+  ['dialog', 'Dialogs', 'Dialog'],
+  ['menu', 'Menu', 'Menu'],
+  ['menu', 'Menu', 'Menu item'],
+  ['tabbar', 'Tab Bar', 'TabBar'],
+  ['tabbar', 'Tab Bar', 'Tab'],
+  ['switch', 'Swithes', 'Swith'],
+  ['folder', 'Folders', 'Folder'],
+  ['folder', 'Folders', 'Tab Folder'],
+];
+let customIdx = 0;
+for (const [kind, pageName, nodeName] of CUSTOM_COMPONENTS) {
+  const page = pages.find((p) => p.name === pageName);
+  if (!page) continue;
+  const kids = (idx.kids.get(page.__key) || []).filter((k) => k.name === nodeName);
+  const k = kids[0];
+  if (!k) continue;
+  const tree = resolveTree(k, idx);
+  const tr = tree.transform || { m02: 0, m12: 0 };
+  const w = Math.round(tree.size?.x || 0), h = Math.round(tree.size?.y || 0);
+  if (!w || !h) continue;
+  let html;
+  if (nodeName === 'Dialog') {
+    // crop the dialog card out of the full-screen dialog frame (the scrim is drawn by the app)
+    const card = findDeep(tree, 'Basic dialog');
+    const ctr = card ? card.transform || { m02: 0, m12: 0 } : { m02: 28, m12: 352 };
+    const cw = card ? Math.round(card.size?.x || 356) : 356, ch = card ? Math.round(card.size?.y || 213) : 213;
+    const inner = card ? renderNode({ ...card, transform: { ...(card.transform || {}), m02: 0, m12: 0 } }, blobs, 0, {}) : '';
+    html = `<div style="position:absolute;left:0;top:0;width:${cw}px;height:${ch}px">${inner}</div>`;
+    const id = 'c-dialog-modal';
+    writeScreenJs(id, html, { w: cw, h: ch, title: 'Basic dialog', kind: 'dialog' });
+    manifest.components.push({ id, name: 'Basic dialog', kind: 'dialog', w: cw, h: ch });
+    continue;
+  }
+  const html2 = `<div style="position:absolute;left:0;top:0">${renderNode({ ...tree, transform: { ...(tree.transform || {}), m02: 0, m12: 0 } }, blobs, 0, {})}</div>`;
+  const id = `c-${kind}-x${customIdx++}`;
+  writeScreenJs(id, html2, { w, h, title: k.name, kind });
+  manifest.components.push({ id, name: k.name, kind, w, h });
+}
+
+function findDeep(n, name) {
+  if (n.name === name) return n;
+  for (const c of n.children || []) { const r = findDeep(c, name); if (r) return r; }
+  return null;
+}
+
 for (const [pageName, kind] of COMPONENT_PAGES) {
   const page = pages.find((p) => p.name === pageName);
   if (!page) continue;
