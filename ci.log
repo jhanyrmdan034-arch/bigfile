@@ -1,0 +1,86 @@
+== versions ==
+v22.23.4
+analyze-general.mjs
+analyze.mjs
+analyze2.mjs
+bisect.mjs
+bisect2.mjs
+decode.mjs
+dump.mjs
+fetch-images.mjs
+fields.mjs
+fonts.mjs
+genapp.mjs
+genfonts.mjs
+inst.mjs
+lib
+node_modules
+outline.mjs
+package-lock.json
+package.json
+pages.mjs
+screenshots.mjs
+shot.mjs
+shothtml.mjs
+t3.mjs
+test-geom.mjs
+tree.mjs
+== genapp ==
+node:fs:560
+  return binding.open(
+                 ^
+
+Error: ENOENT: no such file or directory, open '/home/user/bigfile/design/canvas.fig'
+    at Object.openSync (node:fs:560:18)
+    at Object.readFileSync (node:fs:444:35)
+    at loadFig (file:///home/runner/work/bigfile/bigfile/tools/lib/fig.mjs:7:18)
+    at file:///home/runner/work/bigfile/bigfile/tools/genapp.mjs:282:17
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/user/bigfile/design/canvas.fig'
+}
+
+Node.js v22.23.4
+GENAPP_FAILED 1
+== images ==
+node:fs:440
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open '/home/user/bigfile/www/manifest.json'
+    at Object.readFileSync (node:fs:440:20)
+    at file:///home/runner/work/bigfile/bigfile/tools/fetch-images.mjs:12:32
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/home/user/bigfile/www/manifest.json'
+}
+
+Node.js v22.23.4
+IMAGES_FAILED 1
+== screenshots ==
+node:fs:1370
+  const result = binding.mkdir(
+                         ^
+
+Error: EACCES: permission denied, mkdir '/home/user/bigfile/previews'
+    at Object.mkdirSync (node:fs:1370:26)
+    at file:///home/runner/work/bigfile/bigfile/tools/screenshots.mjs:10:4
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'mkdir',
+  path: '/home/user/bigfile/previews'
+}
+
+Node.js v22.23.4
+SHOTS_FAILED 1
