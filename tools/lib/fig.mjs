@@ -89,6 +89,7 @@ export function resolveTree(root, index, opts = {}) {
         const m = overrideMap(raw);
         const symPath = guidKey(sym.guid);
         node = applyOverrides(sym, m.get(symPath), { __instanceOf: raw.name, __instanceSize: raw.size, __instanceKey: guidKey(raw.guid) });
+        node.__instanceResize = { from: sym.size, to: raw.size };
         node.size = raw.size || sym.size;
         node.transform = raw.transform || sym.transform;
         node.name = raw.name;
@@ -117,12 +118,53 @@ export function resolveTree(root, index, opts = {}) {
     const srcKey = node.__srcKey || guidKey(node.guid);
     const rawKids = index.kids.get(srcKey) || [];
     // instance-level structural overrides (children added/removed) are not represented; fine for this kit
-    const children = rawKids.map((k) => visit(k, childPath, childOv, depth + 1, childGuard));
+    let children = rawKids.map((k) => visit(k, childPath, childOv, depth + 1, childGuard));
+    children = adjustChildren(node, children);
     const out = { ...node, __path: childPath.join('>'), children };
     delete out.__srcKey;
     return out;
   };
   return visit(root, [], null, 0, []);
+}
+
+const BG_LAYER = /^(Fill|Blur|Mask|Effect|Gradient Blur|BG|Background|Liquid Glass|Surface|Overlay)$/i;
+function near(a, b) { return a != null && b != null && Math.abs(a - b) < 1.5; }
+
+// Figma auto-layout / instance-resize: give child layers the size the design intends.
+function adjustChildren(parent, children) {
+  const ps = parent.size;
+  if (!ps || !children.length) return children;
+  const padL = parent.stackHorizontalPadding ?? 0, padR = parent.stackPaddingRight ?? padL;
+  const padT = parent.stackVerticalPadding ?? 0, padB = parent.stackPaddingBottom ?? padT;
+  const innerW = Math.max(0, ps.x - padL - padR), innerH = Math.max(0, ps.y - padT - padB);
+  const rs = parent.__instanceResize;
+  return children.map((c) => {
+    const cs = c.size;
+    if (!cs) return c;
+    const tr = c.transform || { m02: 0, m12: 0, m00: 1, m11: 1, m01: 0, m10: 0 };
+    const atOrigin = Math.abs(tr.m02) < 0.5 && Math.abs(tr.m12) < 0.5;
+    const identity = Math.abs(tr.m00 - 1) < 1e-5 && Math.abs(tr.m11 - 1) < 1e-5 && Math.abs(tr.m01) < 1e-5 && Math.abs(tr.m10) < 1e-5;
+    if (!identity) return c;
+    let w = cs.x, h = cs.y, changed = false;
+
+    // (a) instance was resized: stretch layers that still carry the symbol's original size
+    if (rs && rs.to && rs.from && atOrigin) {
+      if (near(cs.x, rs.from.x) && near(cs.y, rs.from.y) && (!near(rs.from.x, rs.to.x) || !near(rs.from.y, rs.to.y))) {
+        w = rs.to.x; h = rs.to.y; changed = true;
+      }
+    }
+    // (b) auto-layout children that fill their parent
+    const growW = (c.stackChildPrimaryGrow && parent.stackMode === 'HORIZONTAL') || c.stackPrimarySizing === 'FILL' && parent.stackMode === 'HORIZONTAL' || c.stackCounterSizing === 'FILL' && parent.stackMode === 'VERTICAL';
+    const growH = (c.stackChildPrimaryGrow && parent.stackMode === 'VERTICAL') || c.stackPrimarySizing === 'FILL' && parent.stackMode === 'VERTICAL' || c.stackCounterSizing === 'FILL' && parent.stackMode === 'HORIZONTAL';
+    if (growW && innerW > w) { w = innerW; changed = true; }
+    if (growH && innerH > h) { h = innerH; changed = true; }
+    // (c) background layers of a component that were left at their default 100x100
+    if (!changed && atOrigin && !c.children?.length && BG_LAYER.test(c.name) && (w < innerW - 1 || h < innerH - 1)) {
+      if (innerW > 0 && innerH > 0 && w >= innerW * 0.2 && h >= innerH * 0.2) { w = innerW; h = innerH; changed = true; }
+    }
+    if (!changed) return c;
+    return { ...c, size: { x: w, y: h } };
+  });
 }
 
 export function findByName(page, index, name, type) {

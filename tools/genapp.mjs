@@ -203,11 +203,23 @@ function textHtml(n, blobs) {
   return `<div class="t" style="${st.join(';')}">${esc(chars)}</div>`;
 }
 
+function bboxOfPath(d) {
+  const nums = (d.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (let i = 0; i + 1 < nums.length; i += 2) {
+    minX = Math.min(minX, nums[i]); maxX = Math.max(maxX, nums[i]);
+    minY = Math.min(minY, nums[i + 1]); maxY = Math.max(maxY, nums[i + 1]);
+  }
+  return { minX, minY, maxX, maxY };
+}
+
 function vectorHtml(n, blobs) {
-  const geoms = [...(n.fillGeometry || []), ...(n.strokeGeometry || [])];
-  if (!geoms.length) return '';
+  const fillGeoms = n.fillGeometry || [];
+  const strokeGeoms = n.strokeGeometry || [];
+  if (!fillGeoms.length && !strokeGeoms.length) return '';
   const w = Math.max(1, n.size?.x ?? 1), h = Math.max(1, n.size?.y ?? 1);
   const paths = [];
+  const boxes = [];
   const fills = (n.fillPaints || []).filter((p) => p.visible !== false);
   const strokes = (n.strokePaints || []).filter((p) => p.visible !== false);
   let fill = 'none';
@@ -218,31 +230,44 @@ function vectorHtml(n, blobs) {
     else if (p.type === 'IMAGE') fill = 'none';
     else if (p.type === 'PATTERN') fill = '#dfe7ee';
   }
-  for (const g of (n.fillGeometry || [])) {
+  for (const g of fillGeoms) {
     const b = blobs[g.commandsBlob];
     if (!b) continue;
     const d = parseCommands(b.bytes);
     if (!d) continue;
     paths.push(`<path d="${d}" fill="${fill}" fill-rule="${(g.windingRule || 'NONZERO').toLowerCase() === 'evenodd' ? 'evenodd' : 'nonzero'}"/>`);
+    boxes.push(bboxOfPath(d));
   }
-  for (const s of strokes) {
-    if (s.type !== 'SOLID') continue;
-    for (const g of (n.strokeGeometry || [])) {
+  for (const st of strokes) {
+    if (st.type !== 'SOLID') continue;
+    for (const g of strokeGeoms) {
       const b = blobs[g.commandsBlob];
       if (!b) continue;
       const d = parseCommands(b.bytes);
       if (!d) continue;
-      paths.push(`<path d="${d}" fill="none" stroke="${rgba(s.color)}" stroke-width="${h2(n.strokeWeight ?? 1)}" stroke-linejoin="${(n.strokeJoin || 'MITER').toLowerCase()}" stroke-linecap="${(n.strokeCap || 'NONE').toLowerCase() === 'round' ? 'round' : 'butt'}"/>`);
+      paths.push(`<path d="${d}" fill="none" stroke="${rgba({ ...st.color, a: (st.color?.a ?? 1) * (st.opacity ?? 1) })}" stroke-width="${h2(n.strokeWeight ?? 1)}" stroke-linejoin="${(n.strokeJoin || 'MITER').toLowerCase()}" stroke-linecap="${(n.strokeCap || 'NONE').toLowerCase() === 'round' ? 'round' : 'butt'}"/>`);
+      boxes.push(bboxOfPath(d));
     }
   }
   if (!paths.length) return '';
+  // viewBox: the geometry's own bounds, so artwork is scaled into the node box
+  let vb = { x: 0, y: 0, w, h };
+  if (boxes.length) {
+    const u = boxes.reduce((a, b) => ({ minX: Math.min(a.minX, b.minX), minY: Math.min(a.minY, b.minY), maxX: Math.max(a.maxX, b.maxX), maxY: Math.max(a.maxY, b.maxY) }),
+      { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+    const bw = u.maxX - u.minX, bh = u.maxY - u.minY;
+    // only re-base when the geometry doesn't already match the node box (avoids 1px drift)
+    if (bw > 0.5 && bh > 0.5 && (Math.abs(bw - w) > 1.5 || Math.abs(bh - h) > 1.5 || Math.abs(u.minX) > 1.5 || Math.abs(u.minY) > 1.5)) {
+      vb = { x: u.minX, y: u.minY, w: bw, h: bh };
+    }
+  }
   const tr = n.transform || { m02: 0, m12: 0, m00: 1, m11: 1, m01: 0, m10: 0 };
   const simple = Math.abs(tr.m00 - 1) < 1e-5 && Math.abs(tr.m11 - 1) < 1e-5 && Math.abs(tr.m01) < 1e-5 && Math.abs(tr.m10) < 1e-5;
   const st = simple
     ? `left:${h2(tr.m02)}px;top:${h2(tr.m12)}px;width:${h2(w)}px;height:${h2(h)}px`
     : `left:0;top:0;width:${h2(w)}px;height:${h2(h)}px;transform:matrix(${h2(tr.m00)},${h2(tr.m10)},${h2(tr.m01)},${h2(tr.m11)},${h2(tr.m02)},${h2(tr.m12)});transform-origin:0 0`;
   const op = n.opacity !== undefined && n.opacity !== 1 ? `;opacity:${h2(n.opacity)}` : '';
-  return `<div class="v" style="${st}${op}"><svg width="100%" height="100%" viewBox="0 0 ${h2(w)} ${h2(h)}" preserveAspectRatio="none" overflow="visible">${paths.join('')}</svg></div>`;
+  return `<div class="v" style="${st}${op}"><svg width="100%" height="100%" viewBox="${h2(vb.x)} ${h2(vb.y)} ${h2(vb.w)} ${h2(vb.h)}" preserveAspectRatio="xMidYMid meet" overflow="visible">${paths.join('')}</svg></div>`;
 }
 
 const SKIP_NAMES = new Set(['Bezel']);
