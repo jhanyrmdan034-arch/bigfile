@@ -132,9 +132,10 @@
   function qsa(root, sel) { return Array.prototype.slice.call(root.querySelectorAll(sel)); }
   function byName(root, name) { return qsa(root, '[data-n="' + name + '"]'); }
 
-  function hotspot(parent, x, y, w, h, onClick, cls) {
+  function hotspot(parent, x, y, w, h, onClick, cls, tag) {
     var d = document.createElement('div');
     d.className = 'hot' + (cls ? ' ' + cls : '');
+    if (tag) d.setAttribute('data-hot', tag);
     d.style.left = x + 'px'; d.style.top = y + 'px';
     d.style.width = w + 'px'; d.style.height = h + 'px';
     d.addEventListener('click', function (ev) {
@@ -182,7 +183,7 @@
       hotspot(el, i * colW, top + 12, colW, 60, function () {
         if (stack.length === 1 && stack[0].id === id) return;
         switchTab(id, i);
-      }, 'round');
+      }, 'round', 'tab' + i);
     });
   }
 
@@ -193,7 +194,7 @@
       if (!n.classList.contains('n')) return;
       var x = parseFloat(n.style.left) || 0, y = parseFloat(n.style.top) || 0;
       var w = parseFloat(n.style.width) || 46, h = parseFloat(n.style.height) || 46;
-      hotspot(el, x, y, w, h, function () { pop(); }, 'round');
+      hotspot(el, x, y, w, h, function () { pop(); }, 'round', 'back');
     });
   }
 
@@ -209,7 +210,7 @@
       if (!n.classList.contains('n')) return;
       var x = parseFloat(n.style.left) || 0, y = parseFloat(n.style.top) || 0;
       var w = parseFloat(n.style.width) || 46, h = parseFloat(n.style.height) || 46;
-      hotspot(el, x - 4, y - 4, w + 8, h + 8, function () { openSheet('c-sheet-0'); }, 'round');
+      hotspot(el, x - 4, y - 4, w + 8, h + 8, function () { openSheet('c-sheet-0'); }, 'round', 'fab');
     });
 
     // app-bar avatar / headline -> chat info
@@ -234,7 +235,7 @@
       rows.forEach(function (n, i) {
         var x = parseFloat(n.style.left) || 0, y = parseFloat(n.style.top) || 0;
         var w = parseFloat(n.style.width) || 412, h = parseFloat(n.style.height) || 72;
-        hotspot(el, x, y, w, h, function () { open(chatTargets[i % chatTargets.length]); });
+        hotspot(el, x, y, w, h, function () { open(chatTargets[i % chatTargets.length]); }, '', 'row');
       });
     }
 
@@ -262,7 +263,7 @@
         hotspot(el, x, y, w, h, function () {
           if (i % 4 === 0) openDialog('c-dialog-0');
           else if (i % 4 === 1) openSheet('c-menu-2');
-        });
+        }, '', 'cell');
       });
     }
 

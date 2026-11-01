@@ -30,11 +30,17 @@ await page.goto('http://127.0.0.1:8098/index.html', { waitUntil: 'load' });
 await new Promise((r) => setTimeout(r, 900));
 check('boot: chat list is the root screen', (await page.evaluate(() => document.querySelectorAll('.screen').length)) === 1);
 
+const tap = (tag) => page.evaluate((t) => {
+  const el = document.querySelector('.screen [data-hot="' + t + '"], .screen [data-hot^="' + t + '"]');
+  if (!el) return false;
+  const r = el.getBoundingClientRect();
+  el.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }));
+  return true;
+}, tag);
+
 // open a chat by tapping the first list row
-await page.evaluate(() => {
-  const hot = document.querySelectorAll('#layers .hot')[0];
-  hot.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 200, clientY: 200 }));
-});
+const rowTapped = await tap('row');
+check('chat list rows are tappable', rowTapped);
 await new Promise((r) => setTimeout(r, 900));
 check('tap chat row -> chat screen pushed', (await page.evaluate(() => document.querySelectorAll('.screen').length)) === 2,
   'screens=' + (await page.evaluate(() => document.querySelectorAll('.screen').length)));
@@ -62,13 +68,8 @@ await new Promise((r) => setTimeout(r, 500));
 check('system back -> previous screen', (await page.evaluate(() => document.querySelectorAll('.screen').length)) === 1);
 
 // FAB opens the design's bottom sheet
-await page.evaluate(() => {
-  const fab = Array.from(document.querySelectorAll('.screen .hot')).find((h) => {
-    const p = h.previousElementSibling;
-    return p && p.getAttribute('data-n') === 'FAB';
-  }) || document.querySelectorAll('.screen .hot')[0];
-  fab.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 370, clientY: 790 }));
-});
+const fabTapped = await tap('fab');
+check('FAB hotspot exists', fabTapped);
 await new Promise((r) => setTimeout(r, 900));
 const sheetOpen = await page.evaluate(() => {
   const ov = document.getElementById('overlay');
@@ -83,11 +84,7 @@ await new Promise((r) => setTimeout(r, 500));
 check('tap outside -> sheet closes', (await page.evaluate(() => document.getElementById('overlay').classList.contains('on'))) === false);
 
 // tab bar switches root screens
-await page.evaluate(() => {
-  const hots = Array.from(document.querySelectorAll('.screen .hot'));
-  const tab = hots.find((h) => (parseFloat(h.style.top) || 0) > 800);
-  tab.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 300, clientY: 860 }));
-});
+await tap('tab2');
 await new Promise((r) => setTimeout(r, 1200));
 const tabScreen = await page.evaluate(() => {
   const scr = document.querySelector('.screen');
@@ -95,11 +92,6 @@ const tabScreen = await page.evaluate(() => {
 });
 check('tab bar switches screens', !!tabScreen && tabScreen !== 'chat-list', 'now=' + tabScreen);
 
-// design kit gallery opens from the app bar menu
-const kitOpened = await page.evaluate(async () => {
-  const url = 'http://127.0.0.1:8098/index.html';
-  return true;
-});
 check('gallery screens are generated', fs.existsSync(path.join(WWW, 'screens/kit-general.js')) && fs.existsSync(path.join(WWW, 'screens/kit-messages.js')));
 
 check('no runtime errors', errors.length === 0, errors.slice(0, 3).join(' | '));
