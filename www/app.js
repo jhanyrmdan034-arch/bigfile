@@ -28,7 +28,7 @@
 
     // Android hardware back / back gesture
     window.__androidBack = function () {
-      if (overlay) { closeOverlay(); return true; }
+      if (overlay && overlay.classList.contains('on')) { closeOverlay(); return true; }
       if (stack.length > 1) { pop(); return true; }
       return false;
     };
@@ -99,7 +99,7 @@
         setTimeout(function () { prev.el.classList.remove('exit-slide'); }, 300);
       }
       wire(el, id, payload);
-      if (payload.kind === 'page') addPageBack(el, payload);
+      if (payload.kind === 'page') wirePage(el, id, payload);
       return el;
     });
   }
@@ -456,7 +456,9 @@
         setTimeout(function () {
           closeOverlay();
           if (idx >= 0 && window.__MANIFEST) {
-            setTimeout(function () { window.__openKitIndex(window.__MANIFEST.pages); }, 160);
+            setTimeout(function () {
+              window.__openKitIndex(window.__MANIFEST.pages);
+            }, 400);
           }
         }, 120);
       }
