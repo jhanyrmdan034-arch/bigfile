@@ -1,9 +1,10 @@
+import { fileURLToPath } from 'url';
 // Generate the Android UI prototype (HTML/CSS/JS) from the Figma .fig scene graph.
 import fs from 'fs';
 import path from 'path';
 import { loadFig, buildIndex, resolveTree, parseCommands, guidKey } from './lib/fig.mjs';
 
-const ROOT = '/home/user/bigfile';
+const ROOT = process.env.FIG_ROOT || fileURLToPath(new URL('..', import.meta.url)).replace(/\/$/, '');
 const OUT = `${ROOT}/www`;
 const IMG_DIR = `${OUT}/assets/img`;
 

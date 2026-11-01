@@ -1,6 +1,7 @@
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { loadFig, buildIndex, resolveTree } from './lib/fig.mjs';
-const { msg } = loadFig('/home/user/bigfile/design/canvas.fig');
+const { msg } = loadFig(`${process.env.FIG_ROOT || fileURLToPath(new URL('..', import.meta.url)).replace(/\/$/, '')}/design/canvas.fig`);
 const idx = buildIndex(msg);
 const pages = idx.nodes.filter(n => n.type === 'CANVAS');
 let totalNodes = 0;

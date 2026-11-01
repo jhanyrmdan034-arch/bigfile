@@ -1,10 +1,11 @@
+import { fileURLToPath } from 'url';
 // Screenshot every generated screen (used for visual verification against the Figma design).
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
 import puppeteer from 'puppeteer';
 
-const ROOT = '/home/user/bigfile';
+const ROOT = process.env.FIG_ROOT || fileURLToPath(new URL('..', import.meta.url)).replace(/\/$/, '');
 const WWW = `${ROOT}/www`;
 const OUT = `${ROOT}/previews`;
 fs.mkdirSync(OUT, { recursive: true });

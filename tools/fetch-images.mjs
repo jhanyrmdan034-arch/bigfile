@@ -1,10 +1,11 @@
+import { fileURLToPath } from 'url';
 // Extract the images referenced by the generated screens from big.zip and downscale them.
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import sharp from 'sharp';
 
-const ROOT = '/home/user/bigfile';
+const ROOT = process.env.FIG_ROOT || fileURLToPath(new URL('..', import.meta.url)).replace(/\/$/, '');
 const WWW = `${ROOT}/www`;
 const IMG_OUT = `${WWW}/assets/img`;
 const UNZIP_DIR = '/tmp/figimages';

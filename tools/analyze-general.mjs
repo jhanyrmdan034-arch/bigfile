@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { loadFig, buildIndex, resolveTree } from './lib/fig.mjs';
 
@@ -5,7 +6,7 @@ const SCREENS = ['Contacts', 'Chat list', 'Chat list - Stories', 'Settings', 'Pr
   'Chat - Personal', 'Chat - Personal - Info', 'Chat - Bot - Greeting', 'Chat - Bot', 'Chat - Bot - Info',
   'Chat - Group', 'Chat - Group - Info'];
 
-const { msg } = loadFig('/home/user/bigfile/design/canvas.fig');
+const { msg } = loadFig(`${process.env.FIG_ROOT || fileURLToPath(new URL('..', import.meta.url)).replace(/\/$/, '')}/design/canvas.fig`);
 const idx = buildIndex(msg);
 const page = idx.nodes.find((n) => n.type === 'CANVAS' && n.name === 'General');
 const frames = (idx.kids.get(page.__key) || []);

@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url';
 import fs from 'fs';
 import sharp from 'sharp';
 import { loadFig, buildIndex } from './lib/fig.mjs';
@@ -5,7 +6,7 @@ import { renderNodeToSvg } from './lib/render.mjs';
 
 const [,, name, pageName, outFile, scaleArg] = process.argv;
 const scale = +(scaleArg || 1);
-const { msg } = loadFig('/home/user/bigfile/design/canvas.fig');
+const { msg } = loadFig(`${process.env.FIG_ROOT || fileURLToPath(new URL('..', import.meta.url)).replace(/\/$/, '')}/design/canvas.fig`);
 const idx = buildIndex(msg);
 const page = idx.nodes.find(n => n.type === 'CANVAS' && n.name === pageName);
 if (!page) { console.error('page not found'); process.exit(1); }
