@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   shots:
     runs-on: ubuntu-latest
@@ -21,19 +24,19 @@ jobs:
       - name: install tool deps
         working-directory: tools
         run: |
-          npm init -y >/dev/null 2>&1 || true
-          npm install sharp puppeteer kiwi-schema --no-audit --no-fund
-      - name: generate screens from the .fig scene graph
-        run: node tools/genapp.mjs
-      - name: extract + downscale design images
-        run: node tools/fetch-images.mjs
-      - name: screenshots
-        run: node tools/screenshots.mjs
-      - name: publish previews
+          npm install sharp puppeteer kiwi-schema --no-audit --no-fund 2>&1 | tail -5
+      - name: pipeline (gen screens + images + screenshots)
+        run: |
+          : > ci.log
+          node tools/genapp.mjs 2>&1 | tee -a ci.log | tail -20
+          node tools/fetch-images.mjs 2>&1 | tee -a ci.log | tail -20
+          node tools/screenshots.mjs 2>&1 | tee -a ci.log | tail -60
+      - name: publish results
+        if: always()
         run: |
           git config user.name "arena-agent"
           git config user.email "agent@arena.ai"
-          du -sh previews www/assets/img
-          git add -f previews www/assets/img
-          git commit -m "chore: extract design images + render screenshots" || echo "nothing to commit"
-          git push
+          du -sh previews www/assets/img 2>/dev/null || true
+          git add -f ci.log previews www/assets/img 2>/dev/null || true
+          git commit -m "chore: design images + rendered previews [skip ci]" || echo "nothing to commit"
+          git push || (git pull --rebase -q && git push)
