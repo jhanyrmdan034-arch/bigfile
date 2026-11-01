@@ -10,5 +10,5 @@ PASS  tab bar switches screens  now=settings
 PASS  gallery screens are generated
 FAIL  design sections index -> kit gallery page  opened=settings
 PASS  back from gallery returns to the app
-FAIL  no runtime errors  EXC ReferenceError: addPageBack is not defined
+PASS  no runtime errors
 SMOKE_FAILED 1
