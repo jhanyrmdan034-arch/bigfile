@@ -511,6 +511,8 @@
       layers.appendChild(el);
       var stage = document.getElementById('stage');
       var isPage = payload.kind === 'page';
+      document.getElementById('viewport').style.alignItems = 'flex-start';
+      document.getElementById('viewport').style.justifyContent = 'flex-start';
       if (isPage) {
         var k = Math.min(1, 412 / payload.w, 917 / payload.h);
         stage.style.width = payload.w + 'px';

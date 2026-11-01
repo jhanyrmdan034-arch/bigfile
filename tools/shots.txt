@@ -1,1 +1,1 @@
-contacts,profile,chat-group,chat-personal-info,c-menu-0,c-sheet-0,kit-general,c-tabbar-0
+kit-general,kit-menu,c-menu-0
