@@ -16,6 +16,7 @@ genfonts.mjs
 icontest.mjs
 inst.mjs
 lib
+makeicon.mjs
 node_modules
 outline.mjs
 package-lock.json
@@ -39,9 +40,9 @@ kit-buttons 930x1094 items=4
 kit-app-bars 4052x4013 items=15
 kit-emoji 4810x8082 items=9
 kit-lists 1463x1524 items=10
-kit-folders 582x784 items=3
+kit-folders 610x784 items=3
 kit-backgrounds 6380x4681 items=4
-kit-swithes 536x616 items=2
+kit-swithes 655x569 items=2
 kit-messages 3247x8569 items=7
 kit-dialogs 812x1429 items=2
 kit-getting-started 1260x864 items=1
@@ -50,7 +51,7 @@ kit-material 1246x772 items=4
 kit-menu 574x768 items=3
 kit-tab-bar 812x884 items=3
 kit-sheets 1284x2175 items=3
-total screen html MB 26.68
+total screen html MB 26.51
 == images ==
 images referenced by the design: 550
 all design images already extracted: 550 / 550
@@ -58,8 +59,6 @@ images written: 0, missing: 550, total 0.00 MB
 missing hashes: f9e3c92f0c1b922007cf1c9b1e59fe02785f7904,0eb58628acbc9e3aaba067ab88657a0288a4a72d,c6d351f9224eb165cf539acd9edeb5c39c5e5511,600801fadf7a50760c2b0de17fa2f4e2be173c95,28ec600b13d8d07aa1dce642f34b28dbe8842a8f,d4a4840f928197f3efc4f409ed9de1243956edd5,3a88446c4d9c92314dfdb1c5239f2f71b49f9770,1679656bd87798b02b0ef9183fb0802a2d41f74a,daac104596a611de62ffdaa6c05c85b610215f63,ce689f1bff0959e57e01e9dfb38f2a45cbf787d4
 == screenshots ==
 shot chat-list {"id":"chat-list","w":412,"h":917,"kind":"screen"}
-shot contacts {"id":"contacts","w":412,"h":917,"kind":"screen"}
 shot settings {"id":"settings","w":412,"h":917,"kind":"screen"}
 shot chat-personal {"id":"chat-personal","w":412,"h":917,"kind":"screen"}
-shot chat-group {"id":"chat-group","w":412,"h":917,"kind":"screen"}
-screenshots: 5
+screenshots: 3
