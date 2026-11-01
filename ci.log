@@ -59,6 +59,4 @@ images written: 0, missing: 550, total 0.00 MB
 missing hashes: f9e3c92f0c1b922007cf1c9b1e59fe02785f7904,0eb58628acbc9e3aaba067ab88657a0288a4a72d,c6d351f9224eb165cf539acd9edeb5c39c5e5511,600801fadf7a50760c2b0de17fa2f4e2be173c95,28ec600b13d8d07aa1dce642f34b28dbe8842a8f,d4a4840f928197f3efc4f409ed9de1243956edd5,3a88446c4d9c92314dfdb1c5239f2f71b49f9770,1679656bd87798b02b0ef9183fb0802a2d41f74a,daac104596a611de62ffdaa6c05c85b610215f63,ce689f1bff0959e57e01e9dfb38f2a45cbf787d4
 == screenshots ==
 shot chat-list {"id":"chat-list","w":412,"h":917,"kind":"screen"}
-shot settings {"id":"settings","w":412,"h":917,"kind":"screen"}
-shot chat-personal {"id":"chat-personal","w":412,"h":917,"kind":"screen"}
-screenshots: 3
+screenshots: 1
