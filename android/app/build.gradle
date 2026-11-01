@@ -17,7 +17,7 @@ android {
     // The prototype UI is generated from the Figma file into ../www
     sourceSets {
         main {
-            assets.srcDirs = ['../www']
+            assets.srcDirs = ['../../www']
         }
     }
 
