@@ -297,7 +297,8 @@ function renderNode(n, blobs, depth, ctx) {
     const mtr = m.transform || { m02: 0, m12: 0 };
     const mw = m.size?.x ?? 0, mh = m.size?.y ?? 0;
     const nw = n.size?.x ?? 0, nh = n.size?.y ?? 0;
-    const r = m.cornerRadius ?? 0;
+    let r = m.cornerRadius ?? 0;
+    if (!r) r = n.cornerRadius ?? n.rectangleTopLeftCornerRadius ?? 0;
     const round = m.type === 'ELLIPSE' ? '50%' : r > 0 ? `${h2(Math.min(r, Math.min(mw, mh) / 2))}px` : '0';
     const top = Math.max(0, mtr.m12), left = Math.max(0, mtr.m02);
     const right = Math.max(0, nw - (mtr.m02 + mw)), bottom = Math.max(0, nh - (mtr.m12 + mh));

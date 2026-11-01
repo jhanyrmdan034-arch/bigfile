@@ -158,6 +158,10 @@ function adjustChildren(parent, children) {
     const growH = (c.stackChildPrimaryGrow && parent.stackMode === 'VERTICAL') || c.stackPrimarySizing === 'FILL' && parent.stackMode === 'VERTICAL' || c.stackCounterSizing === 'FILL' && parent.stackMode === 'HORIZONTAL';
     if (growW && innerW > w) { w = innerW; changed = true; }
     if (growH && innerH > h) { h = innerH; changed = true; }
+    // (d) background layers never stick out of their component
+    if (!changed && atOrigin && BG_LAYER.test(c.name) && (w > innerW + 0.5 || h > innerH + 0.5) && innerW > 0 && innerH > 0) {
+      w = Math.min(w, innerW); h = Math.min(h, innerH); changed = true;
+    }
     // (c) background layers of a component that were left at their default 100x100
     if (!changed && atOrigin && !c.children?.length && BG_LAYER.test(c.name) && (w < innerW - 1 || h < innerH - 1)) {
       if (innerW > 0 && innerH > 0 && w >= innerW * 0.2 && h >= innerH * 0.2) { w = innerW; h = innerH; changed = true; }
