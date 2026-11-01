@@ -8,6 +8,6 @@ PASS  FAB -> design bottom sheet opens
 PASS  tap outside -> sheet closes
 PASS  tab bar switches screens  now=settings
 PASS  gallery screens are generated
-FAIL  design sections index -> kit gallery page  opened=settings(want kit-cover)
+PASS  design sections index -> kit gallery page  opened=kit-cover(want kit-cover)
 PASS  back from gallery returns to the app
 PASS  no runtime errors
