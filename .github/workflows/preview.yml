@@ -103,3 +103,13 @@ jobs:
           if ls apk/*.apk >/dev/null 2>&1; then git add -f apk/*.apk; fi
           git commit -m "release: signed prototype APK [skip ci]" || echo "nothing to commit"
           git push || (git pull --rebase -q && git push)
+      - name: publish download release
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ls -lh apk/ || true
+          if [ ! -f apk/Telegram-UI-Kit-1.0.apk ]; then echo "no apk to publish"; exit 0; fi
+          gh release view v1.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||             gh release create v1.0 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_REF_NAME"               --title "Telegram Android UI Kit — Prototype v1.0"               --notes "نسخه ۱ پروتوتایپ رابط کاربری، ساخته‌شده از فایل Figma (Telegram Android UI Kit). اندروید ۶ و بالاتر · کاملاً آفلاین · بدون بک‌اند."
+          gh release upload v1.0 apk/Telegram-UI-Kit-1.0.apk --repo "$GITHUB_REPOSITORY" --clobber
+          gh release view v1.0 --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[] | "\(.name) \(.size)"'
