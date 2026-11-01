@@ -322,6 +322,23 @@ function renderNode(n, blobs, depth, ctx) {
   const maskKids = (n.children || []).filter((c) => c.mask);
   let extra = '';
   if (maskKids.length) {
+    // a gradient mask fades its siblings instead of cutting them (blur fades in the design)
+    const gm = maskKids.find((m) => (m.fillPaints || []).some((p) => p.type && p.type.startsWith('GRADIENT') && (p.stops || []).some((st) => (st.color.a ?? 1) < 0.999)));
+    if (gm) {
+      const gp = gm.fillPaints.find((p) => p.type && p.type.startsWith('GRADIENT'));
+      const stops = (gp.stops || []).slice().sort((a, b) => a.position - b.position)
+        .map((st) => `rgba(0,0,0,${+(st.color.a ?? 1).toFixed(3)}) ${h2(st.position * 100)}%`).join(',');
+      const hp = gp.gradientHandlePositions || [];
+      const p0 = hp[0] || { x: 0, y: 0 }, p1 = hp[1] || { x: 0, y: 1 };
+      const ang = (Math.atan2((p1.y - p0.y) * (gm.size?.y || 1), (p1.x - p0.x) * (gm.size?.x || 1)) * 180) / Math.PI + 90;
+      const g = `linear-gradient(${h2(ang)}deg, ${stops})`;
+      const mw = gm.size?.x ?? n.size?.x ?? 0, mh = gm.size?.y ?? n.size?.y ?? 0;
+      const mtr = gm.transform || { m02: 0, m12: 0 };
+      extra = `;-webkit-mask-image:${g};mask-image:${g};-webkit-mask-size:${h2(mw)}px ${h2(mh)}px;mask-size:${h2(mw)}px ${h2(mh)}px;` +
+        `-webkit-mask-position:${h2(mtr.m02 || 0)}px ${h2(mtr.m12 || 0)}px;mask-position:${h2(mtr.m02 || 0)}px ${h2(mtr.m12 || 0)}px;` +
+        `-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat`;
+      return renderContainer(n, blobs, depth, ctx, st, extra);
+    }
     const m = maskKids[0];
     const mtr = m.transform || { m02: 0, m12: 0 };
     const mw = m.size?.x ?? 0, mh = m.size?.y ?? 0;
@@ -333,9 +350,13 @@ function renderNode(n, blobs, depth, ctx) {
     const right = Math.max(0, nw - (mtr.m02 + mw)), bottom = Math.max(0, nh - (mtr.m12 + mh));
     extra = `;clip-path:inset(${h2(top)}px ${h2(right)}px ${h2(bottom)}px ${h2(left)}px round ${round})`;
   }
+  return renderContainer(n, blobs, depth, ctx, st, extra);
+}
+
+function renderContainer(n, blobs, depth, ctx, st, extra) {
+  const kids = (n.children || []).map((c) => renderNode(c, blobs, depth + 1, ctx)).join('');
   const name = esc(n.name);
-  const dataExtra = n.type === 'TEXT' ? '' : '';
-  if (!kids && !(n.fillPaints || []).length && !(n.strokePaints || []).length) {
+  if (!kids && !(n.fillPaints || []).length && !(n.strokePaints || []).length && !(n.effects || []).length) {
     return ''; // nothing to paint
   }
   return `<div class="n" data-n="${name}" style="${st}${extra}">${kids}</div>`;
