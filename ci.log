@@ -9,6 +9,7 @@ decode.mjs
 dump.mjs
 fetch-images.mjs
 fields.mjs
+fonts
 fonts.mjs
 genapp.mjs
 genfonts.mjs
@@ -26,61 +27,118 @@ t3.mjs
 test-geom.mjs
 tree.mjs
 == genapp ==
-node:fs:560
-  return binding.open(
-                 ^
-
-Error: ENOENT: no such file or directory, open '/home/user/bigfile/design/canvas.fig'
-    at Object.openSync (node:fs:560:18)
-    at Object.readFileSync (node:fs:444:35)
-    at loadFig (file:///home/runner/work/bigfile/bigfile/tools/lib/fig.mjs:7:18)
-    at file:///home/runner/work/bigfile/bigfile/tools/genapp.mjs:282:17
-    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
-    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
-    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
-  errno: -2,
-  code: 'ENOENT',
-  syscall: 'open',
-  path: '/home/user/bigfile/design/canvas.fig'
-}
-
-Node.js v22.23.4
-GENAPP_FAILED 1
+screens: 13 kit pages: 19 images needed: 550
+kit-cover 3731x1874 items=3
+kit-general 4896x3967 items=17
+kit-sources 5895x1642 items=21
+kit-utilities 1945x1429 items=4
+kit-buttons 930x1094 items=4
+kit-app-bars 4052x4013 items=15
+kit-emoji 4810x8082 items=9
+kit-lists 1463x1524 items=10
+kit-folders 610x784 items=3
+kit-backgrounds 6380x4681 items=4
+kit-swithes 655x569 items=2
+kit-messages 3247x8569 items=7
+kit-dialogs 812x1429 items=2
+kit-getting-started 1260x864 items=1
+kit-kit 564x934 items=2
+kit-material 1246x772 items=4
+kit-menu 574x768 items=3
+kit-tab-bar 812x884 items=3
+kit-sheets 1284x2175 items=3
+total screen html MB 26.34
 == images ==
-node:fs:440
-    return binding.readFileUtf8(path, stringToFlags(options.flag));
-                   ^
-
-Error: ENOENT: no such file or directory, open '/home/user/bigfile/www/manifest.json'
-    at Object.readFileSync (node:fs:440:20)
-    at file:///home/runner/work/bigfile/bigfile/tools/fetch-images.mjs:12:32
-    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
-    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
-    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
-  errno: -2,
-  code: 'ENOENT',
-  syscall: 'open',
-  path: '/home/user/bigfile/www/manifest.json'
-}
-
-Node.js v22.23.4
-IMAGES_FAILED 1
+images referenced by the design: 550
+extracting images from big.zip ...
+images written: 550, missing: 0, total 5.19 MB
 == screenshots ==
-node:fs:1370
-  const result = binding.mkdir(
-                         ^
-
-Error: EACCES: permission denied, mkdir '/home/user/bigfile/previews'
-    at Object.mkdirSync (node:fs:1370:26)
-    at file:///home/runner/work/bigfile/bigfile/tools/screenshots.mjs:10:4
-    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
-    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
-    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
-  errno: -13,
-  code: 'EACCES',
-  syscall: 'mkdir',
-  path: '/home/user/bigfile/previews'
-}
-
-Node.js v22.23.4
-SHOTS_FAILED 1
+shot chat-list {"id":"chat-list","w":412,"h":917,"kind":"screen"}
+shot contacts {"id":"contacts","w":412,"h":917,"kind":"screen"}
+shot chat-list-stories {"id":"chat-list-stories","w":412,"h":917,"kind":"screen"}
+shot settings {"id":"settings","w":412,"h":917,"kind":"screen"}
+shot profile {"id":"profile","w":412,"h":917,"kind":"screen"}
+shot profile-scroll {"id":"profile-scroll","w":412,"h":917,"kind":"screen"}
+shot chat-personal {"id":"chat-personal","w":412,"h":917,"kind":"screen"}
+shot chat-personal-info {"id":"chat-personal-info","w":412,"h":917,"kind":"screen"}
+shot chat-bot-greeting {"id":"chat-bot-greeting","w":412,"h":917,"kind":"screen"}
+shot chat-bot {"id":"chat-bot","w":412,"h":917,"kind":"screen"}
+shot chat-bot-info {"id":"chat-bot-info","w":412,"h":917,"kind":"screen"}
+shot chat-group {"id":"chat-group","w":412,"h":917,"kind":"screen"}
+shot chat-group-info {"id":"chat-group-info","w":412,"h":917,"kind":"screen"}
+shot kit-cover {"id":"kit-cover","w":3731,"h":1874,"kind":"page"}
+shot kit-general {"id":"kit-general","w":4896,"h":3967,"kind":"page"}
+shot kit-sources {"id":"kit-sources","w":5895,"h":1642,"kind":"page"}
+shot kit-utilities {"id":"kit-utilities","w":1945,"h":1429,"kind":"page"}
+shot kit-buttons {"id":"kit-buttons","w":930,"h":1094,"kind":"page"}
+shot kit-app-bars {"id":"kit-app-bars","w":4052,"h":4013,"kind":"page"}
+shot kit-emoji {"id":"kit-emoji","w":4810,"h":8082,"kind":"page"}
+shot kit-lists {"id":"kit-lists","w":1463,"h":1524,"kind":"page"}
+shot kit-folders {"id":"kit-folders","w":610,"h":784,"kind":"page"}
+shot kit-backgrounds {"id":"kit-backgrounds","w":6380,"h":4681,"kind":"page"}
+shot kit-swithes {"id":"kit-swithes","w":655,"h":569,"kind":"page"}
+shot kit-messages {"id":"kit-messages","w":3247,"h":8569,"kind":"page"}
+shot kit-dialogs {"id":"kit-dialogs","w":812,"h":1429,"kind":"page"}
+shot kit-getting-started {"id":"kit-getting-started","w":1260,"h":864,"kind":"page"}
+shot kit-kit {"id":"kit-kit","w":564,"h":934,"kind":"page"}
+shot kit-material {"id":"kit-material","w":1246,"h":772,"kind":"page"}
+shot kit-menu {"id":"kit-menu","w":574,"h":768,"kind":"page"}
+shot kit-tab-bar {"id":"kit-tab-bar","w":812,"h":884,"kind":"page"}
+shot kit-sheets {"id":"kit-sheets","w":1284,"h":2175,"kind":"page"}
+shot c-menu-0 {"id":"c-menu-0","w":174,"h":48,"kind":"menu"}
+shot c-menu-1 {"id":"c-menu-1","w":174,"h":256,"kind":"menu"}
+shot c-menu-2 {"id":"c-menu-2","w":161,"h":112,"kind":"menu"}
+shot c-dialog-0 {"id":"c-dialog-0","w":211,"h":112,"kind":"dialog"}
+shot c-dialog-1 {"id":"c-dialog-1","w":412,"h":917,"kind":"dialog"}
+shot c-sheet-0 {"id":"c-sheet-0","w":285,"h":188,"kind":"sheet"}
+shot c-sheet-1 {"id":"c-sheet-1","w":884,"h":1355,"kind":"sheet"}
+shot c-sheet-2 {"id":"c-sheet-2","w":286,"h":112,"kind":"sheet"}
+shot c-tabbar-0 {"id":"c-tabbar-0","w":121,"h":156,"kind":"tabbar"}
+shot c-tabbar-1 {"id":"c-tabbar-1","w":412,"h":96,"kind":"tabbar"}
+shot c-tabbar-2 {"id":"c-tabbar-2","w":161,"h":112,"kind":"tabbar"}
+shot c-appbar-0 {"id":"c-appbar-0","w":266,"h":148,"kind":"appbar"}
+shot c-appbar-1 {"id":"c-appbar-1","w":286,"h":40,"kind":"appbar"}
+shot c-appbar-2 {"id":"c-appbar-2","w":452,"h":292,"kind":"appbar"}
+shot c-appbar-3 {"id":"c-appbar-3","w":380,"h":165,"kind":"appbar"}
+shot c-appbar-4 {"id":"c-appbar-4","w":452,"h":358,"kind":"appbar"}
+shot c-appbar-5 {"id":"c-appbar-5","w":266,"h":220,"kind":"appbar"}
+shot c-appbar-6 {"id":"c-appbar-6","w":438,"h":194,"kind":"appbar"}
+shot c-appbar-7 {"id":"c-appbar-7","w":398,"h":114,"kind":"appbar"}
+shot c-appbar-8 {"id":"c-appbar-8","w":452,"h":1859,"kind":"appbar"}
+shot c-appbar-9 {"id":"c-appbar-9","w":140,"h":242,"kind":"appbar"}
+shot c-appbar-10 {"id":"c-appbar-10","w":260,"h":2060,"kind":"appbar"}
+shot c-appbar-11 {"id":"c-appbar-11","w":310,"h":408,"kind":"appbar"}
+shot c-appbar-12 {"id":"c-appbar-12","w":452,"h":748,"kind":"appbar"}
+shot c-appbar-13 {"id":"c-appbar-13","w":884,"h":836,"kind":"appbar"}
+shot c-appbar-14 {"id":"c-appbar-14","w":258,"h":112,"kind":"appbar"}
+shot c-button-0 {"id":"c-button-0","w":197,"h":310,"kind":"button"}
+shot c-button-1 {"id":"c-button-1","w":149,"h":152,"kind":"button"}
+shot c-button-2 {"id":"c-button-2","w":142,"h":152,"kind":"button"}
+shot c-button-3 {"id":"c-button-3","w":222,"h":112,"kind":"button"}
+shot c-switch-0 {"id":"c-switch-0","w":255,"h":112,"kind":"switch"}
+shot c-switch-1 {"id":"c-switch-1","w":122,"h":57,"kind":"switch"}
+shot c-folder-0 {"id":"c-folder-0","w":210,"h":112,"kind":"folder"}
+shot c-folder-1 {"id":"c-folder-1","w":98,"h":116,"kind":"folder"}
+shot c-folder-2 {"id":"c-folder-2","w":182,"h":36,"kind":"folder"}
+shot c-list-0 {"id":"c-list-0","w":290,"h":286,"kind":"list"}
+shot c-list-1 {"id":"c-list-1","w":290,"h":84,"kind":"list"}
+shot c-list-2 {"id":"c-list-2","w":259,"h":64,"kind":"list"}
+shot c-list-3 {"id":"c-list-3","w":214,"h":152,"kind":"list"}
+shot c-list-4 {"id":"c-list-4","w":371,"h":180,"kind":"list"}
+shot c-list-5 {"id":"c-list-5","w":303,"h":41,"kind":"list"}
+shot c-list-6 {"id":"c-list-6","w":158,"h":92,"kind":"list"}
+shot c-list-7 {"id":"c-list-7","w":452,"h":226,"kind":"list"}
+shot c-list-8 {"id":"c-list-8","w":130,"h":112,"kind":"list"}
+shot c-list-9 {"id":"c-list-9","w":140,"h":85,"kind":"list"}
+shot c-utility-0 {"id":"c-utility-0","w":441,"h":560,"kind":"utility"}
+shot c-utility-1 {"id":"c-utility-1","w":412,"h":917,"kind":"utility"}
+shot c-utility-2 {"id":"c-utility-2","w":452,"h":136,"kind":"utility"}
+shot c-utility-3 {"id":"c-utility-3","w":212,"h":112,"kind":"utility"}
+shot c-message-0 {"id":"c-message-0","w":380,"h":988,"kind":"message"}
+shot c-message-1 {"id":"c-message-1","w":465,"h":2532,"kind":"message"}
+shot c-message-2 {"id":"c-message-2","w":780,"h":4585,"kind":"message"}
+shot c-message-3 {"id":"c-message-3","w":502,"h":734,"kind":"message"}
+shot c-message-4 {"id":"c-message-4","w":884,"h":2596,"kind":"message"}
+shot c-message-5 {"id":"c-message-5","w":452,"h":405,"kind":"message"}
+shot c-message-6 {"id":"c-message-6","w":286,"h":112,"kind":"message"}
+screenshots: 88
