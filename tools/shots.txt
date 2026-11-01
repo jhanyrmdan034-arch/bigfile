@@ -1,1 +1,1 @@
-settings,chat-list,chat-personal,chat-group,contacts
+chat-list,chat-personal,settings

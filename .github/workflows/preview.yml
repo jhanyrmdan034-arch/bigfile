@@ -48,3 +48,46 @@ jobs:
           [ -d www/assets/img ] && git add -f www/assets/img || true
           git commit -m "chore: design images + rendered previews [skip ci]" || echo "nothing to commit"
           git push || (git pull --rebase -q && git push)
+
+  apk:
+    runs-on: ubuntu-latest
+    needs: shots
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          lfs: false
+      - name: pull generated previews/images (pushed by the shots job)
+        run: git pull --rebase -q origin ${{ github.ref_name }} || true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: install tool deps
+        working-directory: tools
+        run: npm install kiwi-schema sharp --no-audit --no-fund 2>&1 | tail -3
+      - name: generate the interface from the .fig file
+        run: |
+          node tools/genapp.mjs
+          node tools/fetch-images.mjs
+      - name: build the android app
+        working-directory: android
+        run: |
+          echo "== gradle version =="
+          gradle --version | head -6
+          gradle :app:assembleRelease --no-daemon --stacktrace 2>&1 | tail -40
+      - name: publish apk
+        run: |
+          mkdir -p apk
+          cp android/app/build/outputs/apk/release/app-release.apk "apk/Telegram-UI-Kit-1.0.apk"
+          ls -lh apk
+          git config user.name "arena-agent"
+          git config user.email "agent@arena.ai"
+          git add -f apk/*.apk ci.log 2>/dev/null || true
+          git commit -m "release: signed prototype APK [skip ci]" || echo "nothing to commit"
+          git push || (git pull --rebase -q && git push)

@@ -94,7 +94,8 @@ export function resolveTree(root, index, opts = {}) {
         // a symbol instance drawn at a different size than its main component is scaled
         // (Figma scales attached symbol content; the kit also uses it for icon sizes)
         const symSize = sym.size, instSize = raw.size;
-        if (symSize && instSize && symSize.x > 0 && symSize.y > 0 &&
+        const vectorLeaves = countVectorLeaves(sym, index);
+        if (vectorLeaves > 0 && vectorLeaves <= 4 && symSize && instSize && symSize.x > 0 && symSize.y > 0 &&
             (Math.abs(instSize.x / symSize.x - 1) > 1e-3 || Math.abs(instSize.y / symSize.y - 1) > 1e-3)) {
           node.__scaleTo = { kx: instSize.x / symSize.x, ky: instSize.y / symSize.y };
           node.size = symSize;
@@ -133,6 +134,13 @@ export function resolveTree(root, index, opts = {}) {
     return out;
   };
   return visit(root, [], null, 0, []);
+}
+
+function countVectorLeaves(node, index, depth = 0) {
+  if (depth > 6) return 0;
+  let c = node.type === 'VECTOR' ? 1 : 0;
+  for (const k of index.kids.get(guidKey(node.guid)) || []) c += countVectorLeaves(k, index, depth + 1);
+  return c;
 }
 
 const BG_LAYER = /^(Fill|Blur|Mask|Effect|Gradient Blur|BG|Background|Liquid Glass|Surface|Overlay)$/i;
