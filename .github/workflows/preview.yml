@@ -26,17 +26,27 @@ jobs:
         run: |
           npm install sharp puppeteer kiwi-schema --no-audit --no-fund 2>&1 | tail -5
       - name: pipeline (gen screens + images + screenshots)
+        continue-on-error: true
         run: |
-          : > ci.log
-          node tools/genapp.mjs 2>&1 | tee -a ci.log | tail -20
-          node tools/fetch-images.mjs 2>&1 | tee -a ci.log | tail -20
-          node tools/screenshots.mjs 2>&1 | tee -a ci.log | tail -60
+          set -x
+          echo "== versions ==" | tee ci.log
+          node -v 2>&1 | tee -a ci.log
+          ls tools 2>&1 | tee -a ci.log
+          echo "== genapp ==" | tee -a ci.log
+          node tools/genapp.mjs >> ci.log 2>&1 || echo "GENAPP_FAILED $?" | tee -a ci.log
+          echo "== images ==" | tee -a ci.log
+          node tools/fetch-images.mjs >> ci.log 2>&1 || echo "IMAGES_FAILED $?" | tee -a ci.log
+          echo "== screenshots ==" | tee -a ci.log
+          node tools/screenshots.mjs >> ci.log 2>&1 || echo "SHOTS_FAILED $?" | tee -a ci.log
+          tail -40 ci.log
       - name: publish results
         if: always()
         run: |
           git config user.name "arena-agent"
           git config user.email "agent@arena.ai"
           du -sh previews www/assets/img 2>/dev/null || true
-          git add -f ci.log previews www/assets/img 2>/dev/null || true
+          git add -f ci.log || true
+          [ -d previews ] && git add -f previews || true
+          [ -d www/assets/img ] && git add -f www/assets/img || true
           git commit -m "chore: design images + rendered previews [skip ci]" || echo "nothing to commit"
           git push || (git pull --rebase -q && git push)
