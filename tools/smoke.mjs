@@ -108,7 +108,8 @@ const kitIndex = await page.evaluate(async () => {
   const want = rows[0].getAttribute('data-page');
   rows[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
   await new Promise((r) => setTimeout(r, 2200));
-  const scr = document.querySelector('.screen');
+  const all = Array.from(document.querySelectorAll('.screen'));
+  const scr = all[all.length - 1];
   return (scr ? scr.dataset.screen : 'none') + '(want ' + want + ')';
 });
 check('design sections index -> kit gallery page', /^kit-/.test(kitIndex || ''), 'opened=' + kitIndex);
@@ -121,7 +122,8 @@ const dialogShown = await page.evaluate(async () => {
   return true;
 });
 check('back from gallery returns to the app', (await page.evaluate(() => {
-  const s = document.querySelector('.screen');
+  const all = Array.from(document.querySelectorAll('.screen'));
+  const s = all[all.length - 1];
   return !!s && !/^kit-/.test(s.dataset.screen);
 })));
 
