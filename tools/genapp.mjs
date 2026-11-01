@@ -245,8 +245,10 @@ function vectorHtml(n, blobs) {
   return `<div class="v" style="${st}${op}"><svg width="100%" height="100%" viewBox="0 0 ${h2(w)} ${h2(h)}" preserveAspectRatio="none" overflow="visible">${paths.join('')}</svg></div>`;
 }
 
+const SKIP_NAMES = new Set(['Bezel']);
 function renderNode(n, blobs, depth, ctx) {
   if (n.visible === false) return '';
+  if (SKIP_NAMES.has(n.name) && depth > 0) return '';
   if (n.mask) return ''; // handled by parent as clip shape
   if (n.type === 'TEXT') return textHtml(n, blobs);
   if (n.type === 'VECTOR' || n.type === 'BOOLEAN_OPERATION' || n.type === 'ELLIPSE' && (n.fillGeometry || []).length) {
@@ -314,6 +316,7 @@ function writeScreenJs(id, html, meta) {
 }
 function buildScreen(id, frameNode, meta = {}) {
   const tree = resolveTree(frameNode, idx);
+  tree.transform = { ...(tree.transform || {}), m02: 0, m12: 0 };
   const html = renderNode(tree, blobs, 0, {});
   const screen = { id, name: frameNode.name, title: meta.title || frameNode.name, tab: meta.tab || null, w: Math.round(tree.size?.x || 412), h: Math.round(tree.size?.y || 917), frameName: frameNode.name };
   writeScreenJs(id, html, { w: screen.w, h: screen.h, title: screen.title, tab: screen.tab, kind: 'screen' });
