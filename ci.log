@@ -39,9 +39,9 @@ kit-buttons 930x1094 items=4
 kit-app-bars 4052x4013 items=15
 kit-emoji 4810x8082 items=9
 kit-lists 1463x1524 items=10
-kit-folders 610x784 items=3
+kit-folders 582x784 items=3
 kit-backgrounds 6380x4681 items=4
-kit-swithes 655x569 items=2
+kit-swithes 536x616 items=2
 kit-messages 3247x8569 items=7
 kit-dialogs 812x1429 items=2
 kit-getting-started 1260x864 items=1
@@ -50,7 +50,7 @@ kit-material 1246x772 items=4
 kit-menu 574x768 items=3
 kit-tab-bar 812x884 items=3
 kit-sheets 1284x2175 items=3
-total screen html MB 26.37
+total screen html MB 26.68
 == images ==
 images referenced by the design: 550
 all design images already extracted: 550 / 550
@@ -60,7 +60,6 @@ missing hashes: f9e3c92f0c1b922007cf1c9b1e59fe02785f7904,0eb58628acbc9e3aaba067a
 shot chat-list {"id":"chat-list","w":412,"h":917,"kind":"screen"}
 shot contacts {"id":"contacts","w":412,"h":917,"kind":"screen"}
 shot settings {"id":"settings","w":412,"h":917,"kind":"screen"}
-shot profile {"id":"profile","w":412,"h":917,"kind":"screen"}
 shot chat-personal {"id":"chat-personal","w":412,"h":917,"kind":"screen"}
 shot chat-group {"id":"chat-group","w":412,"h":917,"kind":"screen"}
-screenshots: 6
+screenshots: 5
