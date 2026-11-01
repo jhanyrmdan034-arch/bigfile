@@ -3,7 +3,7 @@
 set -e
 cd "$(dirname "$0")/.."
 printf '%s' "$1" > tools/shots.txt
-git add -A tools www .github
+git add -A tools www .github android
 git -c http.version=HTTP/1.1 commit -q -m "chore: refresh previews (${1:-all})" || true
 git -c http.version=HTTP/1.1 push -q origin arena/5fd27e85-bigfile
 sleep 10
