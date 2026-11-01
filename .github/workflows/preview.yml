@@ -23,6 +23,8 @@ jobs:
         run: |
           npm init -y >/dev/null 2>&1 || true
           npm install sharp puppeteer kiwi-schema --no-audit --no-fund
+      - name: generate screens from the .fig scene graph
+        run: node tools/genapp.mjs
       - name: extract + downscale design images
         run: node tools/fetch-images.mjs
       - name: screenshots
