@@ -96,6 +96,7 @@ jobs:
           ls -lh apk
           git config user.name "arena-agent"
           git config user.email "agent@arena.ai"
-          git add -f apk/*.apk ci.log 2>/dev/null || true
+          git add -f ci.log || true
+          if ls apk/*.apk >/dev/null 2>&1; then git add -f apk/*.apk; fi
           git commit -m "release: signed prototype APK [skip ci]" || echo "nothing to commit"
           git push || (git pull --rebase -q && git push)
