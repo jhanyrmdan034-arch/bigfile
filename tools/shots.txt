@@ -1,1 +1,1 @@
-kit-general,kit-menu,c-menu-0
+chat-personal

@@ -36,6 +36,7 @@ jobs:
           node tools/fetch-images.mjs >> ci.log 2>&1 || echo "IMAGES_FAILED $?" | tee -a ci.log
           echo "== screenshots ==" | tee -a ci.log
           SHOTS="$(cat tools/shots.txt 2>/dev/null | tr -d '[:space:]')" node tools/screenshots.mjs >> ci.log 2>&1 || echo "SHOTS_FAILED $?" | tee -a ci.log
+          node tools/smoke.mjs >> ci.log 2>&1 || echo "SMOKE_FAILED $?" | tee -a ci.log
           tail -40 ci.log
       - name: publish results
         if: always()
