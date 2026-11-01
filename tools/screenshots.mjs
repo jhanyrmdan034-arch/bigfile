@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
 await new Promise((r) => server.listen(8099, '127.0.0.1', r));
 
 const manifest = JSON.parse(fs.readFileSync(`${WWW}/manifest.json`, 'utf8'));
-const only = process.argv[2] ? process.argv[2].split(',') : null;
+const only = (process.env.SHOTS || process.argv[2] || '') ? (process.env.SHOTS || process.argv[2]).split(',') : null;
 
 const browser = await puppeteer.launch({
   headless: 'new',

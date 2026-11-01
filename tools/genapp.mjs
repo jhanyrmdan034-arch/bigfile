@@ -57,23 +57,31 @@ function gradientCss(paint, w, h) {
   return `linear-gradient(${stops})`;
 }
 
-function paintsToBackground(paints, w, h) {
-  const layers = [];
-  for (const p of paints.slice().reverse()) { // Figma: last = topmost; CSS: first = topmost
+// CSS layering: background-image stack (first = topmost) + a fallback background-color.
+function paintsToCss(paints, w, h) {
+  const images = [];
+  const sizes = [];
+  const positions = [];
+  let color = null;
+  for (const p of paints.slice().reverse()) {
     if (p.visible === false) continue;
-    if (p.type === 'SOLID') {
-      layers.push(`${rgba({ ...p.color, a: (p.color?.a ?? 1) * (p.opacity ?? 1) })}`);
-    } else if (p.type && p.type.startsWith('GRADIENT')) {
-      layers.push(gradientCss(p, w, h));
+    if (p.type && p.type.startsWith('GRADIENT')) {
+      images.push(gradientCss(p, w, h)); sizes.push('auto'); positions.push('0 0');
     } else if (p.type === 'IMAGE') {
       const src = imageSrc(hashHex(p.image?.hash));
-      if (src) layers.push(`url(${src})`);
-      else layers.push('#c9d3dd');
+      if (src) {
+        images.push(`url(${src})`);
+        const mode = p.imageScaleMode || 'FILL';
+        sizes.push(mode === 'FIT' ? 'contain' : mode === 'STRETCH' ? '100% 100%' : 'cover');
+        positions.push('center');
+      }
+    } else if (p.type === 'SOLID') {
+      if (color == null) color = rgba({ ...p.color, a: (p.color?.a ?? 1) * (p.opacity ?? 1) });
     } else if (p.type === 'PATTERN') {
-      layers.push('#dfe7ee');
+      if (color == null) color = '#dfe7ee';
     }
   }
-  return layers;
+  return { images, sizes, positions, color };
 }
 
 let clipCounter = 0;
@@ -103,22 +111,12 @@ function nodeStyle(n, ctx) {
   // fills
   const fills = (n.fillPaints || []).filter((p) => p.visible !== false);
   if (fills.length && n.type !== 'TEXT') {
-    const layers = paintsToBackground(fills, w, h);
-    if (layers.length) {
-      st.push(`background:${layers.join(',')}`);
-      // sizing for image layers
-      const sizes = [];
-      const positions = [];
-      for (const p of fills.slice().reverse()) {
-        if (p.visible === false) continue;
-        if (p.type === 'IMAGE') {
-          const mode = p.imageScaleMode || 'FILL';
-          sizes.push(mode === 'FIT' ? 'contain' : mode === 'STRETCH' ? '100% 100%' : 'cover');
-          positions.push('center');
-        } else { sizes.push('auto'); positions.push('0 0'); }
-      }
-      if (sizes.length > 1) { st.push(`background-size:${sizes.join(',')}`); st.push(`background-position:${positions.join(',')}`); }
-      else if (sizes.length === 1 && fills.some((p) => p.type === 'IMAGE')) { st.push(`background-size:${sizes[0]}`); st.push('background-position:center'); }
+    const css = paintsToCss(fills, w, h);
+    if (css.color) st.push(`background-color:${css.color}`);
+    if (css.images.length) {
+      st.push(`background-image:${css.images.join(',')}`);
+      st.push(`background-size:${css.sizes.join(',')}`);
+      st.push(`background-position:${css.positions.join(',')}`);
       st.push('background-repeat:no-repeat');
     }
     for (const p of fills) if (p.type === 'IMAGE' && p.image?.hash) noteImage(hashHex(p.image.hash), w, h, p.image.name);
@@ -281,8 +279,10 @@ function renderNode(n, blobs, depth, ctx) {
       const w = n.size?.x ?? 0, h = n.size?.y ?? 0;
       const st = nodeStyle(n, ctx);
       const fills = (n.fillPaints || []).filter((p) => p.visible !== false);
-      const bg = paintsToBackground(fills, w, h).join(',') || 'transparent';
-      return `<div class="n" data-n="${esc(n.name)}" style="${st};border-radius:50%;background:${bg}"></div>`;
+      const css2 = paintsToCss(fills, w, h);
+      const bg = css2.color || 'transparent';
+      const bgi = css2.images.length ? `;background-image:${css2.images.join(',')};background-size:${css2.sizes.join(',')};background-position:${css2.positions.join(',')};background-repeat:no-repeat` : '';
+      return `<div class="n" data-n="${esc(n.name)}" style="${st};border-radius:50%;background-color:${bg}${bgi}"></div>`;
     }
     return vectorHtml(n, blobs);
   }
@@ -294,9 +294,14 @@ function renderNode(n, blobs, depth, ctx) {
   let extra = '';
   if (maskKids.length) {
     const m = maskKids[0];
+    const mtr = m.transform || { m02: 0, m12: 0 };
+    const mw = m.size?.x ?? 0, mh = m.size?.y ?? 0;
+    const nw = n.size?.x ?? 0, nh = n.size?.y ?? 0;
     const r = m.cornerRadius ?? 0;
-    const rx = m.type === 'ELLIPSE' || (m.cornerRadius && m.cornerRadius >= Math.min(m.size?.x || 0, m.size?.y || 0) / 2) ? '50%' : `${h2(r)}px`;
-    extra = `;overflow:hidden;border-radius:${rx}`;
+    const round = m.type === 'ELLIPSE' ? '50%' : r > 0 ? `${h2(Math.min(r, Math.min(mw, mh) / 2))}px` : '0';
+    const top = Math.max(0, mtr.m12), left = Math.max(0, mtr.m02);
+    const right = Math.max(0, nw - (mtr.m02 + mw)), bottom = Math.max(0, nh - (mtr.m12 + mh));
+    extra = `;clip-path:inset(${h2(top)}px ${h2(right)}px ${h2(bottom)}px ${h2(left)}px round ${round})`;
   }
   const name = esc(n.name);
   const dataExtra = n.type === 'TEXT' ? '' : '';
