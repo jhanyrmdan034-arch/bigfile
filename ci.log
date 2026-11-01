@@ -13,6 +13,7 @@ fonts
 fonts.mjs
 genapp.mjs
 genfonts.mjs
+icontest.mjs
 inst.mjs
 lib
 node_modules
@@ -47,11 +48,11 @@ kit-material 1246x772 items=4
 kit-menu 574x768 items=3
 kit-tab-bar 812x884 items=3
 kit-sheets 1284x2175 items=3
-total screen html MB 26.39
+total screen html MB 26.43
 == images ==
 images referenced by the design: 550
 extracting images from big.zip ...
-images written: 550, missing: 0, total 5.19 MB
+images written: 550, missing: 0, total 5.22 MB
 == screenshots ==
 shot chat-list {"id":"chat-list","w":412,"h":917,"kind":"screen"}
 shot contacts {"id":"contacts","w":412,"h":917,"kind":"screen"}
