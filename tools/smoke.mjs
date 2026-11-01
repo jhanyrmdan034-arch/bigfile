@@ -105,9 +105,11 @@ const kitIndex = await page.evaluate(async () => {
   await new Promise((r) => setTimeout(r, 300));
   const rows = document.querySelectorAll('#overlay [data-page]');
   if (!rows.length) return 'no rows';
+  const want = rows[0].getAttribute('data-page');
   rows[0].dispatchEvent(new MouseEvent('click', { bubbles: true }));
-  await new Promise((r) => setTimeout(r, 1400));
-  return document.querySelector('.screen') ? document.querySelector('.screen').dataset.screen : 'none';
+  await new Promise((r) => setTimeout(r, 2200));
+  const scr = document.querySelector('.screen');
+  return (scr ? scr.dataset.screen : 'none') + '(want ' + want + ')';
 });
 check('design sections index -> kit gallery page', /^kit-/.test(kitIndex || ''), 'opened=' + kitIndex);
 await page.screenshot({ path: path.join(OUT, 'smoke-kit-page.png') });
