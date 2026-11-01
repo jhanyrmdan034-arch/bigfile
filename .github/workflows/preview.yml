@@ -1,8 +1,6 @@
 name: preview
 on:
   push:
-    paths:
-      - '.github/workflows/preview.yml'
   workflow_dispatch:
 permissions:
   contents: write
