@@ -1,4 +1,4 @@
-name: inventory
+name: extract-fig
 on:
   push:
     paths:
@@ -7,7 +7,7 @@ on:
 permissions:
   contents: write
 jobs:
-  inv:
+  ext:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -15,65 +15,16 @@ jobs:
         with:
           lfs: true
           fetch-depth: 1
-      - name: verify archive
+      - name: extract core design files
         run: |
-          echo "== archive =="
-          ls -l big.zip
-          echo "bytes: $(stat -c%s big.zip)"
-          head -c 130 big.zip | od -c | head -3 || true
-      - name: inventory
-        run: |
-          python3 - <<'PY' > report.txt 2>&1
-          import zipfile, collections, os
-          try:
-              z = zipfile.ZipFile('big.zip')
-          except Exception as e:
-              print("NOT_A_ZIP:", type(e).__name__, e)
-              with open('big.zip','rb') as f:
-                  head = f.read(64)
-              print("HEAD_HEX:", head[:64].hex())
-              raise SystemExit(0)
-          infos = z.infolist()
-          print("entries:", len(infos))
-          tot = sum(i.file_size for i in infos)
-          print("uncompressed_bytes:", tot)
-          ext = collections.Counter()
-          extb = collections.Counter()
-          for i in infos:
-              e = os.path.splitext(i.filename)[1].lower()
-              ext[e] += 1
-              extb[e] += i.file_size
-          print("\n== extensions by count ==")
-          for e,c in ext.most_common(30):
-              print(f"{e or '(none)'}\t{c}\t{extb[e]/1e6:.1f}MB")
-          print("\n== top 40 largest ==")
-          for i in sorted(infos, key=lambda x:-x.file_size)[:40]:
-              print(f"{i.file_size/1e6:10.2f}MB\t{i.filename}")
-          print("\n== first 120 entries ==")
-          for i in infos[:120]:
-              print(f"{i.file_size/1e6:10.3f}MB\t{i.filename}")
-          print("\n== top-level dirs ==")
-          top = collections.Counter()
-          for i in infos:
-              p = i.filename.split('/')[0]
-              top[p] += 1
-          for k,v in top.most_common(30):
-              print(f"{v}\t{k}")
-          print("\n== depth-2 sample of names ==")
-          seen = set()
-          for i in infos:
-              parts = i.filename.split('/')
-              key = '/'.join(parts[:2])
-              if key not in seen:
-                  seen.add(key)
-                  print(key)
-              if len(seen) > 200: break
-          PY
-          wc -l report.txt
-      - name: publish report
+          mkdir -p design
+          unzip -o -j big.zip canvas.fig meta.json thumbnail.png -d design
+          ls -l design
+          python3 -c "import json;d=json.load(open('design/meta.json'));print(json.dumps(d)[:2000])" > design/meta_pretty.txt || true
+      - name: publish
         run: |
           git config user.name "arena-agent"
           git config user.email "agent@arena.ai"
-          git add -f report.txt
-          git commit -m "chore: archive inventory report" || echo "nothing to commit"
+          git add -f design
+          git commit -m "chore: extract canvas.fig, meta.json, thumbnail" || echo none
           git push
